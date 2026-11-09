@@ -112,6 +112,12 @@ for (const seletor of ["#filtro-situacao", "#filtro-prioridade", "#ordenacao"]) 
 
 function cadastrarTarefa(dados) {
     tarefas.push({ id: gerarProximoId(), ...dados, concluida: false });
+    atualizarAplicacao();
+}
+
+function atualizarAplicacao() {
+    salvarTarefas();
+    renderizarTarefas();
 }
 
 formulario.addEventListener("submit", event => {
@@ -131,7 +137,6 @@ formulario.addEventListener("submit", event => {
     if (editando) editarTarefa(dados);
     else cadastrarTarefa(dados);
     resetarFormulario();
-    renderizarTarefas();
     mensagemFormulario.textContent = editando ? "Tarefa atualizada com sucesso." : "Tarefa cadastrada com sucesso.";
 });
 
@@ -139,7 +144,7 @@ renderizarTarefas();
 
 function alternarConclusao(tarefa) {
     tarefa.concluida = !tarefa.concluida;
-    renderizarTarefas();
+    atualizarAplicacao();
     mensagemFormulario.textContent = tarefa.concluida ? "Tarefa concluída." : "Tarefa reaberta.";
 }
 
@@ -169,7 +174,9 @@ function preencherFormulario(tarefa) {
 
 function editarTarefa(dados) {
     const indice = tarefas.findIndex(tarefa => tarefa.id === idEmEdicao);
-    if (indice !== -1) tarefas[indice] = { ...tarefas[indice], ...dados };
+    if (indice === -1) return;
+    tarefas[indice] = { ...tarefas[indice], ...dados };
+    atualizarAplicacao();
 }
 
 function resetarFormulario() {
@@ -192,6 +199,6 @@ function excluirTarefa(id) {
     if (!window.confirm("Deseja excluir esta tarefa?")) return;
     tarefas.splice(indice, 1);
     if (idEmEdicao === id) resetarFormulario();
-    renderizarTarefas();
+    atualizarAplicacao();
     mensagemFormulario.textContent = "Tarefa excluída com sucesso.";
 }
