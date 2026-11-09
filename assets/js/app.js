@@ -1,6 +1,7 @@
 console.log("TaskLab iniciado.");
 
-let tarefas = [];
+const CHAVE_TAREFAS = "tasklab:tarefas";
+let tarefas = carregarTarefas();
 let idEmEdicao = null;
 const formulario = document.querySelector("#form-tarefa");
 const campoTitulo = document.querySelector("#titulo");
@@ -10,6 +11,16 @@ const campoData = document.querySelector("#data");
 const mensagemFormulario = document.querySelector("#mensagem-formulario");
 const listaTarefas = document.querySelector("#lista-tarefas");
 const prioridades = { baixa: "Baixa", normal: "Normal", alta: "Alta" };
+
+function salvarTarefas() {
+    localStorage.setItem(CHAVE_TAREFAS, JSON.stringify(tarefas));
+}
+
+function carregarTarefas() {
+    const dados = localStorage.getItem(CHAVE_TAREFAS);
+    if (!dados) return [];
+    return JSON.parse(dados);
+}
 
 function gerarProximoId() {
     if (tarefas.length === 0) return 1;
