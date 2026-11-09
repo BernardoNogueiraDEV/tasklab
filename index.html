@@ -37,6 +37,11 @@
         </section>
         <section class="tarefas-secao" aria-labelledby="titulo-tarefas">
             <div class="cabecalho-lista"><h2 id="titulo-tarefas">Minhas tarefas</h2><p id="resumo-tarefas" aria-live="polite">0 tarefas</p></div>
+            <div class="filtros">
+                <div class="campo"><label for="filtro-situacao">Situação</label><select id="filtro-situacao"><option value="todas">Todas</option><option value="pendentes">Pendentes</option><option value="concluidas">Concluídas</option></select></div>
+                <div class="campo"><label for="filtro-prioridade">Prioridade</label><select id="filtro-prioridade"><option value="todas">Todas</option><option value="baixa">Baixa</option><option value="normal">Normal</option><option value="alta">Alta</option></select></div>
+                <div class="campo"><label for="ordenacao">Ordenar por</label><select id="ordenacao"><option value="cadastro">Cadastro</option><option value="data">Data (mais próxima)</option><option value="prioridade">Prioridade (alta primeiro)</option><option value="titulo">Título (A–Z)</option></select></div>
+            </div>
             <div id="lista-tarefas"></div>
         </section>
     </main>
