@@ -117,6 +117,7 @@ listaTarefas.addEventListener("click", event => {
     if (!tarefa) return;
     if (botao.dataset.acao === "concluir") alternarConclusao(tarefa);
     if (botao.dataset.acao === "editar") preencherFormulario(tarefa);
+    if (botao.dataset.acao === "excluir") excluirTarefa(id);
 });
 
 function preencherFormulario(tarefa) {
@@ -150,3 +151,13 @@ document.querySelector("#botao-cancelar").addEventListener("click", () => {
     mensagemFormulario.textContent = "Edição cancelada. A tarefa foi mantida.";
     campoTitulo.focus();
 });
+
+function excluirTarefa(id) {
+    const indice = tarefas.findIndex(tarefa => tarefa.id === id);
+    if (indice === -1) return;
+    if (!window.confirm("Deseja excluir esta tarefa?")) return;
+    tarefas.splice(indice, 1);
+    if (idEmEdicao === id) resetarFormulario();
+    renderizarTarefas();
+    mensagemFormulario.textContent = "Tarefa excluída com sucesso.";
+}
