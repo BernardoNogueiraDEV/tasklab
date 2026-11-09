@@ -73,7 +73,30 @@ function renderizarTarefas() {
         listaTarefas.append(criarTexto("p", "Nenhuma tarefa cadastrada."));
         return;
     }
-    tarefas.forEach(tarefa => listaTarefas.append(criarCardTarefa(tarefa)));
+    const visiveis = obterTarefasVisiveis();
+    if (visiveis.length === 0) listaTarefas.append(criarTexto("p", "Nenhuma tarefa corresponde aos filtros."));
+    visiveis.forEach(tarefa => listaTarefas.append(criarCardTarefa(tarefa)));
+}
+
+function obterTarefasVisiveis() {
+    const situacao = document.querySelector("#filtro-situacao").value;
+    const prioridade = document.querySelector("#filtro-prioridade").value;
+    const ordenacao = document.querySelector("#ordenacao").value;
+    // filter cria uma nova coleção; sort não modifica o array original.
+    const visiveis = tarefas.filter(tarefa => {
+        const correspondeSituacao = situacao === "todas" ||
+            (situacao === "concluidas" ? tarefa.concluida : !tarefa.concluida);
+        return correspondeSituacao && (prioridade === "todas" || tarefa.prioridade === prioridade);
+    });
+    const pesos = { alta: 3, normal: 2, baixa: 1 };
+    if (ordenacao === "data") visiveis.sort((a, b) => a.data.localeCompare(b.data));
+    if (ordenacao === "titulo") visiveis.sort((a, b) => a.titulo.localeCompare(b.titulo, "pt-BR"));
+    if (ordenacao === "prioridade") visiveis.sort((a, b) => pesos[b.prioridade] - pesos[a.prioridade]);
+    return visiveis;
+}
+
+for (const seletor of ["#filtro-situacao", "#filtro-prioridade", "#ordenacao"]) {
+    document.querySelector(seletor).addEventListener("change", renderizarTarefas);
 }
 
 function cadastrarTarefa(dados) {
