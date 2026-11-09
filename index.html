@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskLab | Gerenciador de Tarefas</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/app.js" defer></script>
+</head>
+<body>
+    <header class="cabecalho">
+        <h1>TaskLab</h1>
+        <p>Organize suas tarefas de forma simples.</p>
+    </header>
+    <main class="conteudo">
+        <section class="formulario-secao" aria-labelledby="titulo-formulario">
+            <h2 id="titulo-formulario">Nova tarefa</h2>
+            <form id="form-tarefa" novalidate>
+                <div class="campo"><label for="titulo">Título</label><input id="titulo" name="titulo" type="text" minlength="3" required></div>
+                <div class="campo"><label for="descricao">Descrição</label><textarea id="descricao" name="descricao" rows="4"></textarea></div>
+                <div class="campo">
+                    <label for="prioridade">Prioridade</label>
+                    <select id="prioridade" name="prioridade" required>
+                        <option value="">Selecione</option>
+                        <option value="baixa">Baixa</option>
+                        <option value="normal">Normal</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+                <div class="campo"><label for="data">Data</label><input id="data" name="data" type="date" required></div>
+                <div class="acoes-formulario">
+                    <button id="botao-salvar" type="submit">Salvar tarefa</button>
+                    <button id="botao-cancelar" type="button" hidden>Cancelar edição</button>
+                </div>
+            </form>
+            <p id="mensagem-formulario" aria-live="polite"></p>
+        </section>
+        <section class="tarefas-secao" aria-labelledby="titulo-tarefas">
+            <div class="cabecalho-lista"><h2 id="titulo-tarefas">Minhas tarefas</h2><p id="resumo-tarefas" aria-live="polite">0 tarefas</p></div>
+            <div id="lista-tarefas"></div>
+        </section>
+    </main>
+</body>
+</html>
