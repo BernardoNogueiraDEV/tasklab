@@ -21,3 +21,6 @@ button { padding: 10px 16px; border: 0; border-radius: 8px; cursor: pointer; bac
 :focus-visible { outline: 3px solid #1d4ed8; outline-offset: 3px; }
 #mensagem-formulario { min-height: 1.5em; }
 .filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+button:disabled { opacity: .55; cursor: default; }
+#aviso-armazenamento:empty { display: none; }
+#aviso-armazenamento { padding: 12px; background: #fef3c7; color: #78350f; border-radius: 8px; }
