@@ -108,6 +108,7 @@ function atualizarResumo() {
 
 function renderizarTarefas() {
     document.querySelector("#aviso-armazenamento").textContent = avisoArmazenamento;
+    atualizarAcoesLista();
     listaTarefas.replaceChildren();
     atualizarResumo();
     if (tarefas.length === 0) {
@@ -137,7 +138,10 @@ function obterTarefasVisiveis() {
 }
 
 for (const seletor of ["#filtro-situacao", "#filtro-prioridade", "#ordenacao"]) {
-    document.querySelector(seletor).addEventListener("change", renderizarTarefas);
+    document.querySelector(seletor).addEventListener("change", () => {
+        if (seletor === "#filtro-situacao") salvarFiltro();
+        renderizarTarefas();
+    });
 }
 
 function cadastrarTarefa(dados) {
@@ -169,8 +173,6 @@ formulario.addEventListener("submit", event => {
     resetarFormulario();
     mensagemFormulario.textContent = editando ? "Tarefa atualizada com sucesso." : "Tarefa cadastrada com sucesso.";
 });
-
-renderizarTarefas();
 
 function alternarConclusao(tarefa) {
     tarefa.concluida = !tarefa.concluida;
@@ -232,3 +234,60 @@ function excluirTarefa(id) {
     atualizarAplicacao();
     mensagemFormulario.textContent = "Tarefa excluída com sucesso.";
 }
+
+function apagarTodasTarefas() {
+    if (tarefas.length === 0 || !window.confirm("Deseja apagar todas as tarefas?")) return;
+    tarefas = [];
+    resetarFormulario();
+    atualizarAplicacao();
+    mensagemFormulario.textContent = "Todas as tarefas foram apagadas.";
+}
+
+function carregarFiltro() {
+    try {
+        const filtro = localStorage.getItem("tasklab:filtro");
+        if (["todas", "pendentes", "concluidas"].includes(filtro)) {
+            document.querySelector("#filtro-situacao").value = filtro;
+        }
+    } catch (erro) {
+        console.error("Não foi possível carregar o filtro.", erro);
+    }
+}
+
+function salvarFiltro() {
+    try {
+        const filtro = document.querySelector("#filtro-situacao").value;
+        // Todas é a preferência padrão; apenas essa chave é removida.
+        if (filtro === "todas") localStorage.removeItem("tasklab:filtro");
+        else localStorage.setItem("tasklab:filtro", filtro);
+    } catch (erro) {
+        console.error("Não foi possível salvar o filtro.", erro);
+        mensagemFormulario.textContent = "O filtro foi aplicado, mas não pôde ser salvo neste navegador.";
+    }
+}
+
+function atualizarAcoesLista() {
+    document.querySelector("#botao-apagar-todas").disabled = tarefas.length === 0;
+    try {
+        document.querySelector("#botao-exemplos").hidden =
+            tarefas.length > 0 || localStorage.getItem(CHAVE_TAREFAS) !== null;
+    } catch {
+        document.querySelector("#botao-exemplos").hidden = true;
+    }
+}
+
+document.querySelector("#botao-apagar-todas").addEventListener("click", apagarTodasTarefas);
+document.querySelector("#botao-exemplos").addEventListener("click", () => {
+    if (tarefas.length > 0) return;
+    const hoje = new Date();
+    const data = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
+    tarefas = [
+        { id: 1, titulo: "Estudar JavaScript", descricao: "Revisar JSON e localStorage.", prioridade: "alta", data, concluida: false },
+        { id: 2, titulo: "Organizar os estudos", descricao: "Planejar as atividades da semana.", prioridade: "normal", data, concluida: true }
+    ];
+    atualizarAplicacao();
+    mensagemFormulario.textContent = "Tarefas de exemplo carregadas.";
+});
+
+carregarFiltro();
+renderizarTarefas();
