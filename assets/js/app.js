@@ -1,6 +1,7 @@
 console.log("TaskLab iniciado.");
 
 let tarefas = [];
+let idEmEdicao = null;
 const formulario = document.querySelector("#form-tarefa");
 const campoTitulo = document.querySelector("#titulo");
 const campoDescricao = document.querySelector("#descricao");
@@ -92,10 +93,12 @@ formulario.addEventListener("submit", event => {
         mensagemFormulario.textContent = erro;
         return;
     }
-    cadastrarTarefa(dados);
-    formulario.reset();
+    const editando = idEmEdicao !== null;
+    if (editando) editarTarefa(dados);
+    else cadastrarTarefa(dados);
+    resetarFormulario();
     renderizarTarefas();
-    mensagemFormulario.textContent = "Tarefa cadastrada com sucesso.";
+    mensagemFormulario.textContent = editando ? "Tarefa atualizada com sucesso." : "Tarefa cadastrada com sucesso.";
 });
 
 renderizarTarefas();
@@ -113,4 +116,37 @@ listaTarefas.addEventListener("click", event => {
     const tarefa = tarefas.find(tarefa => tarefa.id === id);
     if (!tarefa) return;
     if (botao.dataset.acao === "concluir") alternarConclusao(tarefa);
+    if (botao.dataset.acao === "editar") preencherFormulario(tarefa);
+});
+
+function preencherFormulario(tarefa) {
+    idEmEdicao = tarefa.id;
+    campoTitulo.value = tarefa.titulo;
+    campoDescricao.value = tarefa.descricao;
+    campoPrioridade.value = tarefa.prioridade;
+    campoData.value = tarefa.data;
+    document.querySelector("#titulo-formulario").textContent = "Editar tarefa";
+    document.querySelector("#botao-salvar").textContent = "Atualizar tarefa";
+    document.querySelector("#botao-cancelar").hidden = false;
+    mensagemFormulario.textContent = "Edite os dados e clique em Atualizar tarefa.";
+    campoTitulo.focus();
+}
+
+function editarTarefa(dados) {
+    const indice = tarefas.findIndex(tarefa => tarefa.id === idEmEdicao);
+    if (indice !== -1) tarefas[indice] = { ...tarefas[indice], ...dados };
+}
+
+function resetarFormulario() {
+    idEmEdicao = null;
+    formulario.reset();
+    document.querySelector("#titulo-formulario").textContent = "Nova tarefa";
+    document.querySelector("#botao-salvar").textContent = "Salvar tarefa";
+    document.querySelector("#botao-cancelar").hidden = true;
+}
+
+document.querySelector("#botao-cancelar").addEventListener("click", () => {
+    resetarFormulario();
+    mensagemFormulario.textContent = "Edição cancelada. A tarefa foi mantida.";
+    campoTitulo.focus();
 });
