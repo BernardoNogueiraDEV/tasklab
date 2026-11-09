@@ -1,6 +1,7 @@
 console.log("TaskLab iniciado.");
 
 const CHAVE_TAREFAS = "tasklab:tarefas";
+let avisoArmazenamento = "";
 let tarefas = carregarTarefas();
 let idEmEdicao = null;
 const formulario = document.querySelector("#form-tarefa");
@@ -13,13 +14,41 @@ const listaTarefas = document.querySelector("#lista-tarefas");
 const prioridades = { baixa: "Baixa", normal: "Normal", alta: "Alta" };
 
 function salvarTarefas() {
-    localStorage.setItem(CHAVE_TAREFAS, JSON.stringify(tarefas));
+    try {
+        localStorage.setItem(CHAVE_TAREFAS, JSON.stringify(tarefas));
+        avisoArmazenamento = "";
+        return true;
+    } catch (erro) {
+        console.error("Não foi possível salvar as tarefas.", erro);
+        avisoArmazenamento = "Não foi possível salvar no navegador. As alterações estão apenas nesta aba; tente novamente antes de fechá-la.";
+        return false;
+    }
 }
 
 function carregarTarefas() {
-    const dados = localStorage.getItem(CHAVE_TAREFAS);
-    if (!dados) return [];
-    return JSON.parse(dados);
+    try {
+        const dados = localStorage.getItem(CHAVE_TAREFAS);
+        if (dados === null) return [];
+        const tarefasSalvas = JSON.parse(dados);
+        if (!Array.isArray(tarefasSalvas)) throw new Error("A coleção salva não é um array.");
+        const ids = new Set();
+        for (const tarefa of tarefasSalvas) {
+            if (!tarefa || !Number.isSafeInteger(tarefa.id) || tarefa.id < 1 || ids.has(tarefa.id) ||
+                typeof tarefa.titulo !== "string" || tarefa.titulo.trim().length < 3 ||
+                typeof tarefa.descricao !== "string" ||
+                !["baixa", "normal", "alta"].includes(tarefa.prioridade) ||
+                typeof tarefa.data !== "string" || !/^\d{4,}-\d{2}-\d{2}$/.test(tarefa.data) ||
+                Number.isNaN(Date.parse(tarefa.data)) || typeof tarefa.concluida !== "boolean") {
+                throw new Error("A coleção contém uma tarefa inválida ou um identificador repetido.");
+            }
+            ids.add(tarefa.id);
+        }
+        return tarefasSalvas;
+    } catch (erro) {
+        console.error("Não foi possível carregar as tarefas.", erro);
+        avisoArmazenamento = "Não foi possível recuperar as tarefas salvas. A lista foi iniciada vazia; os dados anteriores não foram sobrescritos.";
+        return [];
+    }
 }
 
 function gerarProximoId() {
@@ -78,6 +107,7 @@ function atualizarResumo() {
 }
 
 function renderizarTarefas() {
+    document.querySelector("#aviso-armazenamento").textContent = avisoArmazenamento;
     listaTarefas.replaceChildren();
     atualizarResumo();
     if (tarefas.length === 0) {
