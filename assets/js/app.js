@@ -99,3 +99,18 @@ formulario.addEventListener("submit", event => {
 });
 
 renderizarTarefas();
+
+function alternarConclusao(tarefa) {
+    tarefa.concluida = !tarefa.concluida;
+    renderizarTarefas();
+    mensagemFormulario.textContent = tarefa.concluida ? "Tarefa concluída." : "Tarefa reaberta.";
+}
+
+listaTarefas.addEventListener("click", event => {
+    const botao = event.target.closest("[data-acao]");
+    if (!botao || !listaTarefas.contains(botao)) return;
+    const id = Number(botao.dataset.id);
+    const tarefa = tarefas.find(tarefa => tarefa.id === id);
+    if (!tarefa) return;
+    if (botao.dataset.acao === "concluir") alternarConclusao(tarefa);
+});
